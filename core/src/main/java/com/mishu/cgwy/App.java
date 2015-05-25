@@ -1,4 +1,4 @@
-package me.davenkin;
+package com.mishu.cgwy;
 
 /**
  * Hello world!

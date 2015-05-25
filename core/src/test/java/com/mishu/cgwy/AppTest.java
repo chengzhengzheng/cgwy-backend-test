@@ -1,4 +1,4 @@
-package me.davenkin;
+package com.mishu.cgwy;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
