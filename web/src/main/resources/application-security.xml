@@ -1,0 +1,111 @@
+<!-- - Application context containing authentication, channel - security 
+	and web URI beans. - - Only used by "filter" artifact. - -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+    <bean id="passwordEncoder" class="com.mishu.cgwy.profile.security.CustomPasswordEncoder">
+    </bean>
+
+    <bean id="customerLoginFilter" class="com.mishu.cgwy.profile.security.CustomUsernamePasswordAuthenticationFilter">
+        <property name="usernameParameter" value="username"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="filterProcessesUrl" value="/api/login"/>
+
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="authenticationFailureHandler" ref="restAuthenticationFailureHandler" />
+        <property name="authenticationSuccessHandler" ref="restAuthenticationSuccessHandler" />
+    </bean>
+
+    <bean id="legacyCustomerLoginFilter"
+          class="com.mishu.cgwy.profile.security.CustomUsernamePasswordAuthenticationFilter">
+        <property name="usernameParameter" value="username"/>
+        <property name="passwordParameter" value="password"/>
+        <property name="filterProcessesUrl" value="/api/legacy/login"/>
+
+        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="authenticationFailureHandler" ref="legacyRestAuthenticationFailureHandler" />
+        <property name="authenticationSuccessHandler" ref="legacyRestAuthenticationSuccessHandler" />
+    </bean>
+
+
+    <bean id="userDetailsService"
+          class="com.mishu.cgwy.profile.service.CustomerUserDetailsServiceImpl">
+        <property name="customerService" ref="customerService"/>
+    </bean>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="userDetailsService">
+            <security:password-encoder ref="passwordEncoder" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <security:http
+            realm="Protected API"
+            auto-config="false"
+            entry-point-ref="unauthorizedEntryPoint"
+            authentication-manager-ref="authenticationManager">
+
+        <security:custom-filter position="FORM_LOGIN_FILTER" ref="customerLoginFilter"/>
+        <security:custom-filter after="FORM_LOGIN_FILTER" ref="legacyCustomerLoginFilter"/>
+
+        <security:logout logout-url="/api/legacy/logout" success-handler-ref="legacyLogoutSuccessHandler"/>
+
+        <security:intercept-url pattern="/api/legacy/category" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/product/list" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/product/get/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/version/check/update" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/category/back_search/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/product/search" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/product/hot_sell" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/user/check/username" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/registercode/sms" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/registercode/check" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/register" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/system/param" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/forget/password" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+
+        <security:intercept-url pattern="/api/legacy/cities" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/regions/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/zones/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/rich_text/get/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/api/legacy/dict/key/*" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+
+        <security:intercept-url pattern="/api/**" access="ROLE_USER" />
+    </security:http>
+
+    <bean id="rememberMeServices"
+          class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+        <constructor-arg value="lajsfuiuqjwmoiuz"/>
+        <constructor-arg ref="userDetailsService"/>
+
+        <property name="alwaysRemember" value="true"/>
+        <property name="tokenValiditySeconds" value="15552000" />
+    </bean>
+
+    <bean id="restAuthenticationSuccessHandler"
+          class="com.mishu.cgwy.profile.security.JsonAuthenticationSuccessHandler"/>
+
+    <bean id="restAuthenticationFailureHandler"
+          class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler" />
+
+
+    <bean id="legacyRestAuthenticationSuccessHandler"
+          class="com.mishu.cgwy.profile.security.LegacyJsonAuthenticationSuccessHandler"/>
+
+    <bean id="legacyRestAuthenticationFailureHandler"
+          class="com.mishu.cgwy.profile.security.LegacyJsonAuthenticationFailureHandler" />
+
+
+    <bean id="legacyLogoutSuccessHandler"
+          class="com.mishu.cgwy.profile.security.LegacyLogoutSuccessHandler"/>
+
+
+    <bean id="unauthorizedEntryPoint" class="com.mishu.cgwy.profile.security.UnauthorizedEntryPoint"/>
+
+
+</beans>
