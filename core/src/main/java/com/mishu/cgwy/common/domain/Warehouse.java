@@ -13,14 +13,14 @@ public class Warehouse {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private String name;
-	
+
 	@ManyToOne
-	@JoinColumn(name = "city_id",nullable = false)
+	@JoinColumn(name = "city_id", nullable = false)
 	private City city;
-	
-	public String getDisplayName(){
-		return city.getName()+"-"+name;
+
+	public String getDisplayName() {
+		return city.getName() + "-" + name;
 	}
 }

@@ -80,27 +80,29 @@ public class Order {
 	private List<Refund> refunds = new ArrayList<Refund>();
 
 	@ManyToMany(fetch = FetchType.LAZY, targetEntity = Promotion.class)
-	@JoinTable(name = "order_promotion_xref", joinColumns = @JoinColumn(name = "order_id"), 
-	inverseJoinColumns = @JoinColumn(name = "promotion_id"))
+	@JoinTable(name = "order_promotion_xref", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "promotion_id"))
 	private List<Promotion> promotions = new ArrayList<Promotion>();
-	
-	//计算所有的OrderItem的值只是简单的相加
-	public void calculateSubTotal(){
+
+	// 计算所有的OrderItem的值只是简单的相加
+	public void calculateSubTotal() {
 		subToal = BigDecimal.ZERO;
-		for(OrderItem orderItem:orderItems){
-			orderItem.setTotalPrice(orderItem.getPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
+		for (OrderItem orderItem : orderItems) {
+			orderItem.setTotalPrice(orderItem.getPrice().multiply(
+					BigDecimal.valueOf(orderItem.getQuantity())));
 			subToal = subToal.add(orderItem.getTotalPrice());
 		}
 	}
-	
-	//应用promoation、shipping、discount 之后实际的价格
-	public void calculateTotal(){
+
+	// 应用promoation、shipping、discount 之后实际的价格
+	public void calculateTotal() {
 		BigDecimal discount = BigDecimal.ZERO;
-		for(Promotion promotion:promotions){
+		for (Promotion promotion : promotions) {
 			discount = discount.add(promotion.getDiscount());
 		}
 		total = subToal.add(shipping).subtract(discount);
 	}
+
+	private boolean satisfied;
 
 	@Override
 	public String toString() {
@@ -112,8 +114,5 @@ public class Order {
 				+ ", restaurant=" + restaurant + ", refunds=" + refunds
 				+ ", promotions=" + promotions + "]";
 	}
-	
-	
-	
 
 }

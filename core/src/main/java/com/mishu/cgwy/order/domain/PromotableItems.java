@@ -12,8 +12,8 @@ import com.mishu.cgwy.product.domain.Sku;
 @Entity
 public class PromotableItems {
 	@ManyToOne
-	@JoinColumn(name="sku_id")
-	 private Sku sku;
+	@JoinColumn(name = "sku_id")
+	private Sku sku;
 	private int quantity;
 
 }
